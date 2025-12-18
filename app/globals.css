@@ -1,0 +1,93 @@
+:root {
+  --term-color-0: #000000;
+  --term-color-1: #990000;
+  --term-color-2: #00a600;
+  --term-color-3: #999900;
+  --term-color-4: #0000b2;
+  --term-color-5: #b200b2;
+  --term-color-6: #00a6b2;
+  --term-color-7: #bfbfbf;
+  --term-hi-color-0: #666666;
+  --term-hi-color-1: #e60000;
+  --term-hi-color-2: #00d900;
+  --term-hi-color-3: #e6e600;
+  --term-hi-color-4: #0000ff;
+  --term-hi-color-5: #e600e6;
+  --term-hi-color-6: #00e6e6;
+  --term-hi-color-7: #e6e6e6;
+}
+
+body {
+  margin: 0;
+  font-family: 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+  background: #18181a;
+  color: #e5e5e5;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
+
+#hiddenInput {
+  position: fixed;
+  top: -1000px;
+  left: -1000px;
+  opacity: 0;
+}
+
+.console-container {
+  /* max-width: 700px; */
+  overflow: hidden;
+  padding-block: 30px;
+  padding-inline: 60px;
+}
+
+@media screen and (max-width: 600px) {
+  .console-container {
+    padding-block: 0;
+    padding-inline: 20px;
+  }
+}
+
+#console {
+  display: inline;
+  white-space: pre-wrap;
+}
+
+#console::after {
+  content: '\2588';
+}
+
+.text-0 { color: var(--term-color-0); }
+.text-1 { color: var(--term-color-1); }
+.text-2 { color: var(--term-color-2); }
+.text-3 { color: var(--term-color-3); }
+.text-4 { color: var(--term-color-4); }
+.text-5 { color: var(--term-color-5); }
+.text-6 { color: var(--term-color-6); }
+.text-7 { color: var(--term-color-7); }
+
+.text-hi-0 { color: var(--term-hi-color-0); }
+.text-hi-1 { color: var(--term-hi-color-1); }
+.text-hi-2 { color: var(--term-hi-color-2); }
+.text-hi-3 { color: var(--term-hi-color-3); }
+.text-hi-4 { color: var(--term-hi-color-4); }
+.text-hi-5 { color: var(--term-hi-color-5); }
+.text-hi-6 { color: var(--term-hi-color-6); }
+.text-hi-7 { color: var(--term-hi-color-7); }
+
+.bg-0 { background-color: var(--term-color-0); }
+.bg-1 { background-color: var(--term-color-1); }
+.bg-2 { background-color: var(--term-color-2); }
+.bg-3 { background-color: var(--term-color-3); }
+.bg-4 { background-color: var(--term-color-4); }
+.bg-5 { background-color: var(--term-color-5); }
+.bg-6 { background-color: var(--term-color-6); }
+.bg-7 { background-color: var(--term-color-7); }
+
+.bg-hi-0 { background-color: var(--term-hi-color-0); }
+.bg-hi-1 { background-color: var(--term-hi-color-1); }
+.bg-hi-2 { background-color: var(--term-hi-color-2); }
+.bg-hi-3 { background-color: var(--term-hi-color-3); }
+.bg-hi-4 { background-color: var(--term-hi-color-4); }
+.bg-hi-5 { background-color: var(--term-hi-color-5); }
+.bg-hi-6 { background-color: var(--term-hi-color-6); }
+.bg-hi-7 { background-color: var(--term-hi-color-7); }
