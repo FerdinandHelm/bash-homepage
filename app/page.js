@@ -28,6 +28,7 @@ export default function Home() {
 
   // HISTORY
   const history = useRef([]);
+  const historyIndex = useRef(-1);
 
   // SCROLL HANDLING FOR MOBILE
   const lastScrollY = useRef(0);
@@ -171,6 +172,10 @@ export default function Home() {
 
     setCommand("");
     commandRef.current = "";
+    if(cmd && history.current[0] !== cmd) history.current.unshift(cmd);
+    if(history.current.length > 100) history.current.pop();
+    window.localStorage.setItem('history', JSON.stringify(history.current));
+    historyIndex.current = -1;
 
     setContent(prev => prev + cmd + "\n");
 
@@ -214,7 +219,23 @@ export default function Home() {
 
     if (event.key === "Enter") executeCommand();
     else if (event.key === "Backspace") removeLetter();
-    else if (event.key.length === 1) addLetter(event.key);
+    else if (event.key === "ArrowUp") {
+      if (historyIndex.current < history.current.length - 1) {
+        historyIndex.current++;
+        setCommand(history.current[historyIndex.current]);
+        commandRef.current = history.current[historyIndex.current];
+      }
+    } else if (event.key === "ArrowDown") {
+      if (historyIndex.current > 0) {
+        historyIndex.current--;
+        setCommand(history.current[historyIndex.current]);
+        commandRef.current = history.current[historyIndex.current];
+      } else {
+        historyIndex.current = -1;
+        setCommand("");
+        commandRef.current = "";
+      }
+    } else if (event.key.length === 1) addLetter(event.key);
   };
 
   const formatDate = (date = new Date()) => {
@@ -233,9 +254,12 @@ export default function Home() {
     lastScrollY.current = window.scrollY;
     getModule('motd')(echo, {});
 
-    if(localStorage.getItem("lastLogin")) {
+    if (localStorage.getItem("lastLogin")) {
       var lastLogin = new Date(parseInt(localStorage.getItem("lastLogin")));
       echo(`\nLast login: ${formatDate(lastLogin)} on ttys030\n`);
+    }
+    if (localStorage.getItem("history")) {
+      history.current = JSON.parse(localStorage.getItem("history"));
     }
 
     localStorage.setItem("lastLogin", Date.now());
