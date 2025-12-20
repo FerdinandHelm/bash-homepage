@@ -1,9 +1,9 @@
 import { importModule } from '../modules';
-import delay from '../delay';
+import { delay, openTab } from '../utils';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }) {
   echo("We're operating in 9 countries, just pick one and browse around!");
   await delay(2000);
-  window.open("https://juvigo.xyz/", "_blank");
+  openTab("https://juvigo.xyz/");
   return 0;
 });

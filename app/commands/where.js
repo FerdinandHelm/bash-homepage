@@ -1,7 +1,7 @@
 import { importModule } from '../modules';
-import delay from '../delay';
+import { delay } from '../utils';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }) {
   echo("This is a little thingy I made for my road trip in 2023/24, might not be up to date");
   await delay(2000);
   window.open("https://whereisfreddie.today");

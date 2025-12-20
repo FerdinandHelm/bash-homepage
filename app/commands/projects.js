@@ -1,6 +1,6 @@
 import { importModule } from '../modules';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }) {
   echo("My projects are just as all-over-the-place as I am :D Here are some of them:\n");
   
   echo('Juvi\x1b\[38;2;249;148;32;1mgo\x1b\[0m');

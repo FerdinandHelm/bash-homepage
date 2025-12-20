@@ -1,6 +1,6 @@
 import { importModule } from '../modules';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }, args) {
   const location = args.length ? args.join("%20") : 'Berlin';
 
   if(!args.length) {

@@ -1,6 +1,9 @@
 import { importModule } from '../modules';
 
-importModule(import.meta.url, async function(echo, args) {
+// module's command will be read from filename
+// 1st arg: API
+// 2nd arg: command arguments array
+importModule(import.meta.url, async function({ echo }, args) {
   // add code here
 
   return 0;

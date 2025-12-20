@@ -1,6 +1,6 @@
 import { importModule } from '../modules';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }) {
   const ageDate = new Date(Date.now() - new Date(1998, 5, 22));
   const age = Math.abs(ageDate.getUTCFullYear() - 1970);
 

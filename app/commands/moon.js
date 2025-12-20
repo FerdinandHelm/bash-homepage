@@ -1,6 +1,6 @@
 import { importModule } from '../modules';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }) {
   echo("Loading moon...");
   try {
     const data = await fetch('https://wttr.in/Moon?A');

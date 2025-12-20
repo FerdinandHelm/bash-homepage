@@ -1,6 +1,6 @@
 import { importModule } from '../modules';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }) {
   const ageDate = new Date(Date.now() - new Date(1998, 5, 22));
   const age = Math.abs(ageDate.getUTCFullYear() - 1970);
 
@@ -20,10 +20,10 @@ importModule(import.meta.url, async function(echo, args) {
   echo('H:::::::H     H:::::::Hi::::::i !!! ');
   echo('H:::::::H     H:::::::Hi::::::i!!:!!');
   echo('HHHHHHHHH     HHHHHHHHHiiiiiiii !!!\n');
-  echo("I'm Ferdinand Helm, but you can call me \x1b\[1mFreddie\x1b\[0m or Ferdi.");
+  echo("I'm Ferdinand Helm, but you can call me \x1b\[1mFreddie\x1b\[0m.");
   echo(`I'm ${age} years old and I live in Berlin, Germany.`);
   echo('Welcome to my website!\n');
-  echo("To get started, type \x1b[1mhelp\x1b[0m and hit enter to see available commands.");
+  echo("To get started, try typing \x1b[1mhelp\x1b[0m and hit enter to see what commands are available.");
 
   return 0;
 });

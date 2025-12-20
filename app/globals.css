@@ -38,6 +38,7 @@ body {
   overflow: hidden;
   padding-block: 30px;
   padding-inline: 60px;
+  cursor: text;
 }
 
 @media screen and (max-width: 600px) {
@@ -91,3 +92,29 @@ body {
 .bg-hi-5 { background-color: var(--term-hi-color-5); }
 .bg-hi-6 { background-color: var(--term-hi-color-6); }
 .bg-hi-7 { background-color: var(--term-hi-color-7); }
+
+
+#musicPlayer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 20px;
+  padding: 10px;
+  width: 200px;
+  border: 3px solid #fff;
+  border-radius: 10px;
+  cursor: initial;
+}
+
+#musicPlayer button {
+  float: right;
+  width: 35px;
+  height: 35px;
+  font-size: 24px;
+  background-color: transparent;
+  color: #fff;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  text-align: center;
+  cursor: pointer;
+}

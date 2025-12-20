@@ -1,7 +1,7 @@
 import { importModule } from '../modules';
-import delay from '../delay';
+import { delay } from '../utils';
 
-importModule(import.meta.url, async function(echo, args) {
+importModule(import.meta.url, async function({ echo }) {
   echo("I really recommend the Blue Mountain!");
   await delay(2000);
   window.open("https://vernissagecoffee.com/");
