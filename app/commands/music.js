@@ -6,7 +6,7 @@ importModule(import.meta.url, async function({ echo, setPlaylist }, args) {
   if(!args.length) {
     setPlaylist(musicTracks);
     echo("Playing background music!");
-    echo("Type 'music stop' to stop.");
+    echo("Type 'music stop' to stop. Type music [track] to play a specific track.");
     return 0;
   }
 

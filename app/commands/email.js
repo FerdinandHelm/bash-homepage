@@ -1,9 +1,8 @@
 import { importModule } from '../modules';
-import { delay } from '../utils';
 
-importModule(import.meta.url, async function({ echo }) {
+importModule(import.meta.url, async function({ echo, sleep }) {
   echo("You can email me at ferdinand@helm.berlin!");
-  await delay(2000);
+  await sleep(2000);
   window.location.href = "mailto:ferdinand@helm.berlin";
   return 0;
 });

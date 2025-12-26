@@ -3,7 +3,7 @@
 import { createContext, useState, useEffect, useCallback, useRef, useContext } from "react";
 import debounce from 'debounce';
 import modules, { getModule } from './modules';
-import { formatDate } from './utils';
+import api from './api';
 
 function importAll(r) { r.keys().forEach(r); }
 importAll(require.context('commands', true, /\.js$/));
@@ -181,7 +181,8 @@ export function AppProvider({ children }) {
   };
 
   // public API
-  const app = { echo, playlist, setPlaylist };
+  // functions are either here or in api.js
+  const app = { ...api, playlist, setPlaylist, echo };
 
 
 
@@ -220,7 +221,7 @@ export function AppProvider({ children }) {
 
     if (localStorage.getItem("lastLogin")) {
       var lastLogin = new Date(parseInt(localStorage.getItem("lastLogin")));
-      echo(`\nLast login: ${formatDate(lastLogin)} on ttys030\n`);
+      echo(`\nLast login: ${api.formatDate(lastLogin)} on ttys030\n`);
     }
     if (localStorage.getItem("history")) {
       history.current = JSON.parse(localStorage.getItem("history"));

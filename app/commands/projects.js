@@ -3,7 +3,6 @@ import { importModule } from '../modules';
 importModule(import.meta.url, async function({ echo }) {
   echo("My projects are just as all-over-the-place as I am :D Here are some of them:\n");
   
-  echo('Juvi\x1b\[38;2;249;148;32;1mgo\x1b\[0m');
   echo('\x1b\[38;5;63;1mJuvi\x1b\[38;5;214;1mgo\x1b\[0m');
 
   echo('Europe\'s biggest booking platform for holiday camps and language trips. We started it in 2015 and are now operating in 9 countries. Since 2022, we\'re also organizing our own Juvigo language trips to England, Malta and other great destinations.\n');

@@ -1,4 +1,4 @@
-export const delay = ms => new Promise(res => setTimeout(res, ms));
+export const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 export const openTab = url => {
   const btn = document.createElement('button');
@@ -22,3 +22,5 @@ export const formatDate = (date = new Date()) => {
   }
   return formattedDate;
 };
+
+export default { sleep, openTab, formatDate };
