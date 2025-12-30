@@ -12,7 +12,7 @@ importModule(import.meta.url, async function({ echo }) {
 
   echo('\x1b\[38;5;230;1mVernissage Coffee\x1b\[0m');
 
-  echo('Art meets coffee. We\'re working together with local coffee farmers to offer unique specialty coffee freshly roasted to you.\n');
+  echo('Art meets coffee. We\'re working together with local coffee farmers to offer unique specialty coffee freshly roasted to you.');
   echo('At the moment, we only ship to Germany, but that might change soon!');
   echo('If you\'re interested, type \x1b\[1m\'coffee\'\x1b\[0m!\n\n');
 
@@ -29,7 +29,7 @@ importModule(import.meta.url, async function({ echo }) {
   echo('Type \x1b\[1m\'!important\'\x1b\[0m to check us out on Spotify.\n\n');
 
   echo('\x1b\[38;5;190;1mThis site\x1b\[0m');
-  echo('Another fun side project. I wanted to recreate a Unix shell with Next.js, with support for ANSI escape codes and all its quirks. Also gonna update this regularly and add new fun things\n');
+  echo('Another fun side project. I wanted to recreate a Unix shell with Next.js, with support for ANSI escape codes and all its quirks. Also gonna update this regularly and add new fun things\n\n');
   // echo('If you want to see something cool, type ???');
 
   echo('There\'s a lot more that I can\'t talk about yet, so stay tuned!');

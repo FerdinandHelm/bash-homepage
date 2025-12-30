@@ -2,16 +2,18 @@
 
 import { createContext, useState, useEffect, useCallback, useRef, useContext } from "react";
 import debounce from 'debounce';
+import path from 'path';
+
 import modules, { getModule } from './modules';
 import api from './api';
 
 function importAll(r) { r.keys().forEach(r); }
-importAll(require.context('commands', true, /\.js$/));
-const validCommands = Object.keys(modules);
+importAll(require.context('modules', true, /\.js$/));
+const loadedModules = Object.keys(modules);
 
 const MACHINE = `\x1b[92;1mfreddie@homepage:\x1b[0m`;
-const FOLDER = "\x1b[96m~\x1b[0m";
-const PROMPT = MACHINE + FOLDER + "$ ";
+const HOME_DIR = "/home/freddie";
+const PROMPT = "$ ";
 
 export const AppContext = createContext(undefined);
 
@@ -36,25 +38,30 @@ export function AppProvider({ children }) {
   const renderQueue = useCallback(debounce(() => {
     if(!formatQueue) return;
 
+    
+
     let formattedText = formatQueue
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/(?!\x1b\[0m)\x1b\[38/g, '\x1b\[0m\x1b\[38') // add missing resets
-      .replace(/\x1b\[(.*?);1m(.*?\x1b\[(.*?)m)/g, '<strong>\x1b[$1m$2</strong>') // bold combined resets
-      .replace(/\x1b\[(.*?);3m(.*?\x1b\[(.*?)m)/g, '<em>\x1b[$1m$2</em>') // italic combined resets
-      .replace(/\x1b\[(.*?);4m(.*?\x1b\[(.*?)m)/g, '<u>\x1b[$1m$2</u>') // underline combined resets
-      .replace(/\x1b\[1m(.*?)(\x1b\[(.*?)m)/g, '<strong>$1</strong>$2') // bold
-      .replace(/\x1b\[4m(.*?)(\x1b\[(.*?)m)/g, '<u>$1</u>$2') // underline
-      .replace(/\x1b\[3([0-7])m(.*?)(\x1b\[(.*?)m)/g, `<span class="text-$1">$2</span>$3`) // text standard colors (see globals.css)
-      .replace(/\x1b\[([34])8;2;(\d+;\d+;\d+)m(.*?)(\x1b\[(.*?)m)/g, (match, p1, p2, p3, p4) => {
+      .replace(/\x1b\[(.*?);1m(.*?\x1b\[.*?m|$)/gm, '<span style="font-weight:bold">\x1b[$1m$2</span>') // bold combined resets
+      .replace(/\x1b\[(.*?);3m(.*?\x1b\[.*?m|$)/gm, '<span style="font-style:italic">\x1b[$1m$2</span>') // italic combined resets
+      .replace(/\x1b\[(.*?);4m(.*?\x1b\[.*?m|$)/gm, '<span style="text-decoration:underline">\x1b[$1m$2</span>') // underline combined resets
+      .replace(/\x1b\[1m(.*?)(?=\x1b\[.*?m|$)/gm, '<span style="font-weight:bold">$1</span>') // bold
+      .replace(/\x1b\[4m(.*?)(?=\x1b\[.*?m|$)/gm, '<span style="text-decoration:underline">$1</span>') // underline
+      .replace(/\x1b\[3([0-7])m(.*?)(?=\x1b\[.*?m|$)/gm, `<span class="text-$1">$2</span>`) // text standard colors (see globals.css)
+      .replace(/\x1b\[4([0-7])m(.*?)(?=\x1b\[.*?m|$)/gm, `<span class="bg-$1">$2</span>`) // background standard colors (see globals.css)
+      .replace(/\x1b\[9([0-7])m(.*?)(?=\x1b\[.*?m|$)/gm, `<span class="text-hi-$1">$2</span>`) // text high-intensity colors (see globals.css)
+      .replace(/\x1b\[10([0-7])m(.*?)(?=\x1b\[.*?m|$)/gm, `<span class="bg-hi-$1">$2</span>`) // background high-intensity colors (see globals.css)
+      .replace(/\x1b\[([34])8;2;(\d+;\d+;\d+)m(.*?)(?=\x1b\[.*?m|$)/gm, (match, p1, p2, p3) => {
         const isBackground = (p1 === '4'); // 38=text, 48=background
 
         const rgb = p2.split(';').join(',');
         var color = `style="${isBackground ? 'background-color' : 'color'}: rgb(${rgb})"`;
 
-        return `<span ${color}>${p3}</span>${p4}`;
+        return `<span ${color}>${p3}</span>`;
       })
-      .replace(/\x1b\[([34])8;5;(\d+)m(.*?)(\x1b\[(.*?)m)/g, (match, p1, p2, p3, p4) => {
+      .replace(/\x1b\[([34])8;5;(\d+)m(.*?)(?=\x1b\[.*?m|$)/gm, (match, p1, p2, p3) => {
         const isBackground = (p1 === '4'); // 38=text, 48=background
 
         if(p2 < 8) var color = `class="${isBackground ? 'bg' : 'text'}-${p2}"`; // 0-7: standard colors
@@ -71,17 +78,29 @@ export function AppProvider({ children }) {
           var color = `style="${isBackground ? 'background-color' : 'color'}: rgb(${gray}, ${gray}, ${gray})"`;
         }
 
-        return `<span ${color}>${p3}</span>${p4}`;
+        return `<span ${color}>${p3}</span>`;
       })
-      .replace(/\x1b\[4([0-7])m(.*?)(\x1b\[(.*?)m)/g, `<span class="bg-$1">$2</span>$3`) // background standard colors (see globals.css)
-      .replace(/\x1b\[9([0-7])m(.*?)(\x1b\[(.*?)m)/g, `<span class="text-hi-$1">$2</span>$3`) // text high-intensity colors (see globals.css)
-      .replace(/\x1b\[10([0-7])m(.*?)(\x1b\[(.*?)m)/g, `<span class="bg-hi-$1">$2</span>$3`) // background high-intensity colors (see globals.css)
-      .replace(/\x1b\[(.*?)m/g, '') // reset
+      .replace(/\x1b\[0m/g, '') // reset
 
     addToConsole("");
 
     setContent(prev => {
       let newContent = prev + formattedText;
+      if(newContent.includes('\b')) {
+        while(formattedText.indexOf('\b') !== -1) {
+          const bsIndex = formattedText.indexOf('\b');
+          formattedText = formattedText.slice(0, bsIndex - 1) + formattedText.slice(bsIndex + 1);
+        }
+
+        // handle backspaces
+        const chars = Array.from(newContent);
+        const stack = [];
+        for(const c of chars) {
+          if(c === '\b') stack.pop();
+          else stack.push(c);
+        }
+        newContent = stack.join('');
+      }
       
       // only keep last 250 lines
       const lines = newContent.split("\n");
@@ -126,7 +145,10 @@ export function AppProvider({ children }) {
   };
 
   // shows the prompt ready for typing
-  const printPrompt = () => addToConsole(prev => prev + PROMPT + '\0');
+  const printPrompt = () => {
+    const prompt = MACHINE + `\x1b[96m${pwd === HOME_DIR ? "~" : pwd}\x1b[0m` + PROMPT;
+    addToConsole(prev => prev + prompt + '\0');
+  };
 
   // executes a command
   const executeCommand = async () => {
@@ -148,36 +170,31 @@ export function AppProvider({ children }) {
 
     switch (c) {
       case "":
-        printPrompt();
         break;
       case "clear":
         clearConsole();
-        printPrompt();
         break;
       case "all":
-        echo(validCommands.join(", "));
-        printPrompt();
+        echo(loadedModules.join(", "));
         break;
       case "whoami":
         echo("freddie");
-        printPrompt();
         break;
       case "echo":
         echo(args.join(" "));
-        printPrompt();
         break;
       default:
-        if (validCommands.includes(c)) {
+        if (loadedModules.includes(c)) {
           hang.current = true;
           await getModule(c)(app, args);
           hang.current = false;
-          printPrompt();
         } else {
           echo(`Command not found: ${cmd}`);
-          printPrompt();
         }
         break;
     }
+
+    printPrompt();
   };
 
   // public API
@@ -189,6 +206,13 @@ export function AppProvider({ children }) {
   const handleKeyPress = event => {
     if (hang.current && event.ctrlKey && event.key === 'c') {
       setContent(prev => prev + 'My bad, I haven\'t implemented ^C yet\n');
+      return;
+    }
+
+    if (event.metaKey && event.key === 'k') {
+      clearConsole();
+      printPrompt();
+      return;
     }
 
     // TODO add up/down arrow for command history
