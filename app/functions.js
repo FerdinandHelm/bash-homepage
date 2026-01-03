@@ -1,3 +1,28 @@
+export const getFlagsFromArgs = (args) => {
+  const flags = {};
+
+  while(args[0] && args[0].startsWith('-')) {
+    if(args[0].startsWith('--')) {
+      if(args[0].includes('=')) {
+        const [flag, value] = args[0].slice(2).split('=');
+        flags[flag] = value;
+      }
+      else flags[args[0].slice(2)] = true;
+
+      args.shift();
+      continue;
+    }
+
+    for (const flag of args[0].slice(1)) {
+      flags[flag] = true;
+    }
+    
+    args.shift();
+  }
+
+  return flags;
+}
+
 export const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 export const openTab = url => {
@@ -23,4 +48,10 @@ export const formatDate = (date = new Date()) => {
   return formattedDate;
 };
 
-export default { sleep, openTab, formatDate };
+export const humanFileSize = (size) => {
+  const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+  const sizes = ['B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+  return (size / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+};
+
+export default { getFlagsFromArgs, sleep, openTab, formatDate, humanFileSize };

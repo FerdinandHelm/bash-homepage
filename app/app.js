@@ -5,7 +5,8 @@ import debounce from 'debounce';
 import path from 'path';
 
 import modules, { getModule } from './modules';
-import api from './api';
+import filesystem from './filesystem';
+import functions from './functions';
 
 function importAll(r) { r.keys().forEach(r); }
 importAll(require.context('modules', true, /\.js$/));
@@ -25,6 +26,10 @@ export function AppProvider({ children }) {
   const commandRef = useRef(command);
 
   const hang = useRef(false);
+
+  // FILE TREE
+  const pwd = useRef(HOME_DIR);
+  const pwdIdx = useRef(null);
 
   // HISTORY
   const history = useRef([]);
@@ -114,9 +119,9 @@ export function AppProvider({ children }) {
   useEffect(renderQueue, [formatQueue]);
 
   // adds text to the console along with a newline
-  const echo = text => {
+  const echo = (text, newline = true) => {
     if (text === undefined) return;
-    addToConsole(prev => prev + text + "\n");
+    addToConsole(prev => prev + text + (newline ? "\n" : ""));
   };
 
   // adds a letter to the console
@@ -146,9 +151,13 @@ export function AppProvider({ children }) {
 
   // shows the prompt ready for typing
   const printPrompt = () => {
-    const prompt = MACHINE + `\x1b[96m${pwd === HOME_DIR ? "~" : pwd}\x1b[0m` + PROMPT;
+    const prompt = MACHINE + `\x1b[96m${pwd.current === HOME_DIR ? "~" : pwd.current}\x1b[0m` + PROMPT;
     addToConsole(prev => prev + prompt + '\0');
   };
+
+  // public API
+  // functions are either here or in api.js
+  const api = { ...functions, ...filesystem, playlist, setPlaylist, echo };
 
   // executes a command
   const executeCommand = async () => {
@@ -183,10 +192,86 @@ export function AppProvider({ children }) {
       case "echo":
         echo(args.join(" "));
         break;
+      case "pwd":
+        echo(pwd.current);
+        break;
+      case "cd":
+        const cdPath = args[0] ? path.resolve(pwd.current, args[0].replace(/^~/, HOME_DIR)) : HOME_DIR;
+        try {
+          const file = await api.getFile(cdPath);
+          if(!file || file.type !== "dir") {
+            echo(`cd: not a directory: ${args[0]}`);
+            break;
+          }
+          pwd.current = cdPath;
+          pwdIdx.current = file.id;
+        } catch(error) {
+          console.log(error);
+          echo(`cd: no such file or directory: ${args[0]}`);
+        }
+
+        break;
+      case "ls":
+        const flags = api.getFlagsFromArgs(args);
+        const lsPath = args[0] ? path.resolve(pwd.current, args[0].replace(/^~/, HOME_DIR)) : pwd.current;
+        try {
+          const files = await api.getDirectory(pwdIdx.current || lsPath);
+          files.sort((a, b) => a.name.localeCompare(b.name));
+
+          if(!files.length) break;
+          if(!flags.a) {
+            // filter out hidden files
+            for(let i = files.length - 1; i >= 0; i--) {
+              if(files[i].name.startsWith('.')) files.splice(i, 1);
+            }
+          } else {
+            files.unshift({name: '..', type: 'dir', owner: files[0].owner || 'root@root'});
+            files.unshift({name: '.', type: 'dir', owner: files[0].owner || 'root@root'});
+          }
+          if(flags.l) {
+            echo(`total ${files.length}`);
+            files.forEach(f => {
+              const bytes = f.size || f.content?.length || 0;
+              const size = flags.h ? api.humanFileSize(bytes) : bytes;
+              let line = '';
+              line += (f.type === 'dir' ? 'd' : '-') + (f.permission || 'rwxr-xr-x') + '   ';
+              line += (f.owner || 'root@root').replace('@', '  ') + '  ';
+              line += size.toString().padStart(6, ' ') + ' ';
+              line += f.name;
+              echo(line);
+            });
+            break;
+          }
+          echo(files.map(f => f.name).join("  "));
+        } catch(error) {
+          console.log(error);
+          echo(`ls: could not list directory`);
+        }
+        break;
+      case "cat":
+        if(!args[0]) break;
+        const catPath = path.resolve(pwd.current, args[0].replace(/^~/, HOME_DIR));
+        try {
+          const file = await api.getFile(catPath);
+          if(!file) {
+            echo(`cat: no such file: ${args[0]}`);
+            break;
+          }
+          if(file.type !== "file") {
+            echo(`cat: ${args[0]}: Is a directory`);
+            break;
+          }
+          console.log(file);
+          if(file.content) echo(file.content, false);
+        } catch(error) {
+          console.log(error);
+          echo(`cat: could not read file: ${args[0]}`);
+        }
+        break;
       default:
         if (loadedModules.includes(c)) {
           hang.current = true;
-          await getModule(c)(app, args);
+          await getModule(c)(api, args);
           hang.current = false;
         } else {
           echo(`Command not found: ${cmd}`);
@@ -196,12 +281,6 @@ export function AppProvider({ children }) {
 
     printPrompt();
   };
-
-  // public API
-  // functions are either here or in api.js
-  const app = { ...api, playlist, setPlaylist, echo };
-
-
 
   const handleKeyPress = event => {
     if (hang.current && event.ctrlKey && event.key === 'c') {
@@ -240,8 +319,9 @@ export function AppProvider({ children }) {
   };
 
   useEffect(() => {
-    if(!app) return;
-    getModule('motd')(app, {});
+    filesystem.initFiles();
+
+    getModule('motd')(api, {});
 
     if (localStorage.getItem("lastLogin")) {
       var lastLogin = new Date(parseInt(localStorage.getItem("lastLogin")));
@@ -261,8 +341,9 @@ export function AppProvider({ children }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{...app, content, command, hang}}>
+    <AppContext.Provider value={{content, command, hang}}>
       {children}
+      <button id="hiddenInput" style={{ position: 'fixed', top: '10px', right: '10px' }} onClick={() => addLetter('\b')} />
     </AppContext.Provider>
   );
 }
