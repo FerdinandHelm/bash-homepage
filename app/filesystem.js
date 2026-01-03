@@ -14,7 +14,7 @@ const defaultFiles = {name: '/', type: 'dir', content: [
   ]},
   {name: 'home', type: 'dir', content: [
     {name: 'freddie', type: 'dir', owner: 'freddie@freddie', content: [
-      {name: 'secrets.txt', type: 'file', owner: 'freddie@freddie', permission: 'rw-------', content: "This file is very secret!\n"},
+      {name: 'secrets.txt', type: 'file', owner: 'freddie@freddie', permission: 'rw-------', content: "This file is very secret! My password on every website is Passw0rd!\n"},
       {name: 'todo.txt', type: 'file', owner: 'freddie@freddie', permission: 'rw-r--r--', content: "- laundry\n- buy toilet paper\n- take more trains\n"},
     ]},
   ]},
@@ -26,9 +26,7 @@ const defaultFiles = {name: '/', type: 'dir', content: [
   {name: 'var', type: 'dir', content: []},
 ]};
 
-async function writeDefaultFile(store, file, parentId=null) {
-  console.log(file);
-
+async function createFile(store, file, parentId=null) {
   return new Promise((resolve, reject) => {
     const isDir = file.type === 'dir';
 
@@ -49,7 +47,7 @@ async function writeDefaultFile(store, file, parentId=null) {
       const dirId = event.target.result;
 
       file.content.forEach(subFile => {
-        writeDefaultFile(store, subFile, dirId);
+        createFile(store, subFile, dirId);
       });
 
       resolve(dirId);
@@ -75,7 +73,7 @@ const initFiles = async function() {
 
     // needs to be the first one to have id 1
     // store.put({name: "/", type: "dir", parent: null});
-    writeDefaultFile(store, defaultFiles);
+    createFile(store, defaultFiles);
   };
 
   DBOpenRequest.onsuccess = (event) => {
@@ -85,7 +83,6 @@ const initFiles = async function() {
 }
 
 const getFile = async function(path) {
-  console.log(path);
   if(!DB) throw new Error("Database not initialized");
   if(!path.startsWith("/")) throw new Error("Path must be absolute");
 
@@ -151,7 +148,8 @@ const getDirectory = async function(path) {
     throw new Error("Path must be a string");
   } else {
     const dirFile = await getFile(path);
-    dirId = dirFile ? dirFile.id : null;
+    if(!dirFile || dirFile.type !== 'dir') throw new Error("Directory not found");
+    dirId = dirFile.id;
   }
 
   const store = DB.transaction("files", "readonly").objectStore("files");

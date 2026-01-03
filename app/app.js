@@ -157,7 +157,7 @@ export function AppProvider({ children }) {
 
   // public API
   // functions are either here or in api.js
-  const api = { ...functions, ...filesystem, playlist, setPlaylist, echo };
+  const api = { ...functions, ...filesystem, HOME_DIR, pwd, pwdIdx, playlist, setPlaylist, echo };
 
   // executes a command
   const executeCommand = async () => {
@@ -211,43 +211,6 @@ export function AppProvider({ children }) {
         }
 
         break;
-      case "ls":
-        const flags = api.getFlagsFromArgs(args);
-        const lsPath = args[0] ? path.resolve(pwd.current, args[0].replace(/^~/, HOME_DIR)) : pwd.current;
-        try {
-          const files = await api.getDirectory(pwdIdx.current || lsPath);
-          files.sort((a, b) => a.name.localeCompare(b.name));
-
-          if(!files.length) break;
-          if(!flags.a) {
-            // filter out hidden files
-            for(let i = files.length - 1; i >= 0; i--) {
-              if(files[i].name.startsWith('.')) files.splice(i, 1);
-            }
-          } else {
-            files.unshift({name: '..', type: 'dir', owner: files[0].owner || 'root@root'});
-            files.unshift({name: '.', type: 'dir', owner: files[0].owner || 'root@root'});
-          }
-          if(flags.l) {
-            echo(`total ${files.length}`);
-            files.forEach(f => {
-              const bytes = f.size || f.content?.length || 0;
-              const size = flags.h ? api.humanFileSize(bytes) : bytes;
-              let line = '';
-              line += (f.type === 'dir' ? 'd' : '-') + (f.permission || 'rwxr-xr-x') + '   ';
-              line += (f.owner || 'root@root').replace('@', '  ') + '  ';
-              line += size.toString().padStart(6, ' ') + ' ';
-              line += f.name;
-              echo(line);
-            });
-            break;
-          }
-          echo(files.map(f => f.name).join("  "));
-        } catch(error) {
-          console.log(error);
-          echo(`ls: could not list directory`);
-        }
-        break;
       case "cat":
         if(!args[0]) break;
         const catPath = path.resolve(pwd.current, args[0].replace(/^~/, HOME_DIR));
@@ -299,6 +262,48 @@ export function AppProvider({ children }) {
 
     if (event.key === "Enter") executeCommand();
     else if (event.key === "Backspace") removeLetter();
+    else if (event.key === "Tab") {
+      event.preventDefault();
+      // autocomplete
+      const cmd = commandRef.current;
+      let suggestions = [];
+
+      // command name auto-complete
+      if (!cmd.includes(" ")) {
+        suggestions = loadedModules.filter(m => m.startsWith(cmd));
+        
+        if (suggestions.length === 1) {
+          const newCommand = suggestions[0];
+          setCommand(newCommand);
+          commandRef.current = newCommand;
+        }
+
+        return;
+      }
+
+      // file path auto-complete
+      const lastArg = cmd.substring(cmd.lastIndexOf(" ") + 1);
+      const partialName = lastArg.endsWith('/') ? '' : path.basename(lastArg);
+      let dirPath = lastArg.endsWith('/') ? lastArg : path.dirname(lastArg);
+      dirPath = dirPath.replace(/^~/, HOME_DIR);
+      dirPath = dirPath.startsWith('/') ? dirPath : path.resolve(pwd.current, dirPath);
+
+      api.getDirectory(dirPath).then(files => {
+        console.log(files, partialName);
+        suggestions = files.filter(f => f.name.startsWith(partialName));
+        console.log(suggestions);
+        if (suggestions.length !== 1) return;
+
+        console.log(lastArg);
+        let newCommand = cmd.substring(0, Math.max(cmd.lastIndexOf(' '), cmd.lastIndexOf('/')) + 1) + suggestions[0].name;
+        newCommand += (suggestions[0].type === 'dir' ? '/' : ' ');
+
+        setCommand(newCommand);
+        commandRef.current = newCommand;
+      }).catch(err => {});
+
+      return;
+    }
     else if (event.key === "ArrowUp") {
       if (historyIndex.current < history.current.length - 1) {
         historyIndex.current++;
@@ -341,7 +346,7 @@ export function AppProvider({ children }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{content, command, hang}}>
+    <AppContext.Provider value={{content, command, hang, pwd, pwdIdx}}>
       {children}
       <button id="hiddenInput" style={{ position: 'fixed', top: '10px', right: '10px' }} onClick={() => addLetter('\b')} />
     </AppContext.Provider>
