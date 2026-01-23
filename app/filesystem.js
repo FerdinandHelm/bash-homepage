@@ -1,30 +1,5 @@
+import defaultFiles from './defaultFiles.js';
 let DB = null;
-
-const defaultFiles = {name: '/', type: 'dir', content: [
-  {name: 'bin', type: 'dir', content: [
-      '[','bash','cat','chmod','cp','csh','dash','date','dd','df',
-      'echo','ed','expr','hostname','kill','ksh','launchctl','link','ln','ls',
-      'mkdir','mv','pax','ps','pwd','realpath','rm','rmdir','sh','sleep',
-      'stty','sync','tcsh','test','unlink','wait4path','zsh'
-    ].map(file => ({name: file, type: 'bin', size: Math.random() * 50000 + 100000}))},
-  {name: 'dev', type: 'dir', content: []},
-  {name: 'etc', type: 'dir', content: [ // todo
-    {name: 'passwd', type: 'file', content:`root:x:0:0:root:/root:/bin/bash\nfreddie:x:1000:1000:Freddie,,,:/home/freddie:/bin/bash\n`},
-    {name: 'hostname', type: 'file', content: 'homepage.local\n'},
-  ]},
-  {name: 'home', type: 'dir', content: [
-    {name: 'freddie', type: 'dir', owner: 'freddie@freddie', content: [
-      {name: 'secrets.txt', type: 'file', owner: 'freddie@freddie', permission: 'rw-------', content: "This file is very secret! My password on every website is Passw0rd!\n"},
-      {name: 'todo.txt', type: 'file', owner: 'freddie@freddie', permission: 'rw-r--r--', content: "- laundry\n- buy toilet paper\n- take more trains\n"},
-    ]},
-  ]},
-  {name: 'opt', type: 'dir', content: []},
-  {name: 'private', type: 'dir', content: []},
-  {name: 'sbin', type: 'dir', content: []},
-  {name: 'tmp', type: 'dir', content: []},
-  {name: 'usr', type: 'dir', content: []},
-  {name: 'var', type: 'dir', content: []},
-]};
 
 async function createFile(store, file, parentId=null) {
   return new Promise((resolve, reject) => {
@@ -115,28 +90,28 @@ const getFile = async function(path) {
 }
 
 // --- AI GENERATED, NOT TESTED YET ---
-const createFile = async function(name, type, parent) {
-  if(!DB) throw new Error("Database not initialized");
+// const createFile = async function(name, type, parent) {
+//   if(!DB) throw new Error("Database not initialized");
 
-  let parentId;
-  if(typeof parentId === 'number') {
-    parentId = parent;
-  } else if(typeof parent !== 'string') {
-    throw new Error("Parent path must be a string");
-  } else {
-    const parentFile = await getFile(parent);
-    parentId = parentFile ? parentFile.id : null;
-  }
+//   let parentId;
+//   if(typeof parentId === 'number') {
+//     parentId = parent;
+//   } else if(typeof parent !== 'string') {
+//     throw new Error("Parent path must be a string");
+//   } else {
+//     const parentFile = await getFile(parent);
+//     parentId = parentFile ? parentFile.id : null;
+//   }
 
-  const transaction = DB.transaction("files", "readwrite");
-  const store = transaction.objectStore("files");
+//   const transaction = DB.transaction("files", "readwrite");
+//   const store = transaction.objectStore("files");
 
-  return new Promise((resolve, reject) => {
-    const request = store.add({name, type, parent: parentId});
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+//   return new Promise((resolve, reject) => {
+//     const request = store.add({name, type, parent: parentId});
+//     request.onsuccess = () => resolve(request.result);
+//     request.onerror = () => reject(request.error);
+//   });
+// }
 
 const getDirectory = async function(path) {
   if(!DB) throw new Error("Database not initialized");
