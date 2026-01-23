@@ -346,7 +346,7 @@ export function AppProvider({ children }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{content, command, hang, pwd, pwdIdx}}>
+    <AppContext.Provider value={{content, command, hang, pwd, pwdIdx, playlist}}>
       {children}
       <button id="hiddenInput" style={{ position: 'fixed', top: '10px', right: '10px' }} onClick={() => addLetter('\b')} />
     </AppContext.Provider>
