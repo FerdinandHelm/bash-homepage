@@ -3,9 +3,16 @@
   "configurations": [
     {
       "type": "node-terminal",
-      "name": "Run dev server",
+      "name": "Start dev server",
       "request": "launch",
       "command": "npm run dev",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "node-terminal",
+      "name": "Build app",
+      "request": "launch",
+      "command": "npm run build",
       "cwd": "${workspaceFolder}"
     }
   ]

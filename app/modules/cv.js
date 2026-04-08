@@ -10,9 +10,9 @@ importModule(import.meta.url, async function({ echo }) {
   echo('If you want to know where I am right now, type \'\x1b[1mwhere\x1b[0m\'');
 
   echo('\n\x1b\[1mEducation:\x1b\[0m');
-  echo('- 2013-2015: Abitur at Rosa-Luxemburg-Gymnasium, Berlin');
-  echo('- 2016-2017: Studied Computer Science at TU Berlin');
-  echo('- 2017-2018: Studied Applied Computer Science at FSU Jena');
+  echo('- 2013-2015: Abitur at \x1b\[1mRosa-Luxemburg-Gymnasium, Berlin\x1b\[0m');
+  echo('- 2016-2017: Studied Computer Science at \x1b\[1mTU Berlin\x1b\[0m');
+  echo('- 2017-2018: Studied Applied Computer Science at \x1b\[1mFSU Jena\x1b\[0m');
 
   echo('\n\x1b\[1mLanguages I speak (in order of fluency):\x1b\[0m');
   echo('🇩🇪 German');
@@ -22,13 +22,17 @@ importModule(import.meta.url, async function({ echo }) {
   echo('🥖 French');
   echo('🇪🇸 Spanish');
   echo('🇯🇵 Japanese');
-  echo('I can also read/write Cyrillic and Arabic, in case you need that for some obscure project.');
+  echo('I can also read Cyrillic and Arabic, in case you need that for some obscure project.');
 
   echo('\n\x1b\[1mProjects:\x1b\[0m');
   echo('Type \'projects\' to see a list of my projects.');
 
   echo('\n\x1b\[1mLectures:\x1b\[0m');
   echo('I do talks sometimes! Type \'talks\' to see a list of my past talks.');
+
+  echo('\n\x1b\[1mMusic:\x1b\[0m');
+  echo('I play the violin, piano, guitar and ukulele to varying degrees of proficiency, and I mess around in Logic sometimes.');
+  echo('Type \'music\' to play some random background music I made!');
 
   echo('\n\x1b\[1mContact:\x1b\[0m');
   echo('Type \'contact\' for my contact information.');
