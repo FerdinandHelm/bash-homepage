@@ -23,10 +23,10 @@ export default function ConsolePage() {
     if (!c) return;
 
     setTimeout(() => {
-      if(window.visualViewport.height < window.innerHeight) // phone with virtual keyboard open
+      if(Math.round(window.visualViewport.height) < window.innerHeight) // phone with virtual keyboard open
         window.scrollTo(0, c.offsetHeight - window.visualViewport.height + 10, { behavior: 'smooth' });
       else
-        window.scrollTo(0, c.offsetHeight);
+        window.scrollTo(0, c.offsetHeight + 100);
     }, 50);
   };
   useEffect(scrollToPrompt, [app?.content, app?.command]);

@@ -32,7 +32,7 @@ importModule(import.meta.url, async function({ echo }) {
 
   echo('\n\x1b\[1mMusic:\x1b\[0m');
   echo('I play the violin, piano, guitar and ukulele to varying degrees of proficiency, and I mess around in Logic sometimes.');
-  echo('Type \'music\' to play some random background music I made!');
+  echo('Type \'music\' to play some random background music I made...');
 
   echo('\n\x1b\[1mContact:\x1b\[0m');
   echo('Type \'contact\' for my contact information.');

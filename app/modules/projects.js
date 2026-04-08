@@ -16,9 +16,14 @@ importModule(import.meta.url, async function({ echo }) {
   echo('At the moment, we only ship to Germany, but that might change soon!');
   echo('If you\'re interested, type \x1b\[1m\'coffee\'\x1b\[0m!\n\n');
 
-  // echo('\x1b\[1mSkipSchool\x1b\[0m');
-  // echo('Building on all my learnings from Juvigo, I\'m starting SkipSchool in 2026. If you want to start your own company, you can get ')
-  // echo('If you\'re interested, type \'skipschool\'!\n\n');
+  echo('\x1b\[37;1mGood Luck Kid\x1b\[0m');
+
+  echo('I built a custom website design and admin panel for Good Luck Kid, a talent management, label and publishing company headquartered in Berlin. Their releases, writings and productions have accumulated more than one billion streams to date.');
+  echo('To check it out, type \x1b\[1m\'goodluckkid\'\x1b\[0m!\n\n');
+
+  // echo('\x1b\[1m2bhatched\x1b\[0m');
+  // echo('Building on all my learnings from Juvigo, I\'m starting 2bhatched in 2026. If you want to start your own company, you can get ')
+  // echo('If you\'re interested, type \'2bhatched\'!\n\n');
 
   echo('\x1b\[38;5;153;1mWhere Is Freddie Today?\x1b\[0m');
   echo('Small little web app I built to track my travels in 2023/24. Accompanied by a native iOS app that pings my location to a server regularly and offers an interface and sharing extensions to quickly send a photo/song to the site with one tap. Might come back to life in the future.');
@@ -29,7 +34,7 @@ importModule(import.meta.url, async function({ echo }) {
   echo('Type \x1b\[1m\'!important\'\x1b\[0m to check us out on Spotify.\n\n');
 
   echo('\x1b\[38;5;190;1mThis site\x1b\[0m');
-  echo('Another fun side project. I wanted to recreate a Unix shell with Next.js, with support for ANSI escape codes and all its quirks. Also gonna update this regularly and add new fun things\n\n');
+  echo('Another fun side project. I wanted to recreate a Unix shell with Next.js, with support for ANSI escape codes and all its quirks. Also gonna update this regularly and add new fun things.\n\n');
   // echo('If you want to see something cool, type ???');
 
   echo('There\'s a lot more that I can\'t talk about yet, so stay tuned!');
