@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState, useEffect, useCallback, useRef, useContext } from "react";
+import { createContext, useState, useEffect, useCallback, useRef } from "react";
 import debounce from 'debounce';
 import path from 'path';
 
@@ -26,6 +26,12 @@ export function AppProvider({ children }) {
   const commandRef = useRef(command);
 
   const hang = useRef(false);
+
+  // Mobile input ref
+  const inputRef = useRef(null);
+
+  // Only use the hidden input on mobile devices
+  const isAndroid = typeof window !== 'undefined' && /android|mobile/i.test(navigator.userAgent);
 
   // FILE TREE
   const pwd = useRef(HOME_DIR);
@@ -339,15 +345,67 @@ export function AppProvider({ children }) {
     localStorage.setItem("lastLogin", Date.now());
     printPrompt();
 
+    // Focus the hidden input on mount (for mobile)
+    if (inputRef.current) inputRef.current.focus();
+
+    // Desktop: use keydown
     window.addEventListener("keydown", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, []);
 
+  // Mobile/Android: handle input events
+  const handleInput = e => {
+    if (!isAndroid) return; // Prevent double typing on desktop
+    const val = e.target.value;
+    if (val.length < command.length) {
+      for (let i = 0; i < command.length - val.length; i++) handleKeyPress({ key: "Backspace" });
+    } else if (val.length > command.length) {
+      for (let i = 0; i < val.length - command.length; i++) handleKeyPress({ key: val[command.length + i] });
+    }
+    setCommand(val.trim());
+    commandRef.current = val.trim();
+  };
+
+  // Mobile/Android: handle Enter key
+  const handleInputKeyDown = e => {
+    if (!isAndroid) return;
+    if (e.key === "Enter") {
+      handleKeyPress(e);
+      e.preventDefault();
+      setTimeout(() => {
+        if (inputRef.current) inputRef.current.value = "";
+      }, 0);
+    }
+  };
+
+  // Focus input when clicking anywhere (for mobile)
+  const focusInput = () => {
+    if (inputRef.current) inputRef.current.focus();
+  };
+  useEffect(focusInput, []);
+
   return (
     <AppContext.Provider value={{content, command, hang, pwd, pwdIdx, playlist}}>
+      <div onClick={focusInput} style={{width: '100vw', height: '100vh', position: 'fixed', left: 0, top: 0, zIndex: 1, background: 'transparent'}} />
       {children}
+      {/* Hidden input for mobile/Android */}
+      <input
+        ref={inputRef}
+        type="text"
+        inputMode="text"
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
+        style={{ position: 'fixed', opacity: 0, pointerEvents: 'none', zIndex: -1 }}
+        value={command}
+        onChange={() => {}}
+        onInput={isAndroid ? handleInput : () => {}}
+        onKeyDown={isAndroid ? handleInputKeyDown : () => {}}
+        tabIndex={-1}
+        aria-hidden="true"
+      />
       <button id="hiddenInput" style={{ position: 'fixed', top: '10px', right: '10px' }} onClick={() => addLetter('\b')} />
     </AppContext.Provider>
   );
